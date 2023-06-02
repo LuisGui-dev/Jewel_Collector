@@ -61,22 +61,20 @@ namespace Jewel_Collector
         
         public void InteractWithAdjacentItems()
         {
+            CollectJewel();
             List<(int, int)> adjacentPositions = GetAdjacentPositions();
             foreach ((int adjX, int adjY) in adjacentPositions)
             {
                 if (map.IsWithinBounds(adjX, adjY))
                 {
-                    ICell adjacentCell = map.GetCell(adjX, adjY);
-
-                    if (adjacentCell is Jewel jewel)
+                    ICell cell = map.GetCell(adjX, adjY);
+                    if (cell is Jewel jewel)
                     {
-                        Score += jewel.Points;
                         map.SetCell(adjX, adjY, new EmptyCell());
-                        Energy = Math.Min(5, Energy + jewel.Points); // Recarrega a energia com base na pontuação da joia
                     }
-                    else if (adjacentCell is Obstacle obstacle)
+                    else if (cell is Obstacle obstacle)
                     {
-                        Energy = Math.Min(5, Energy + 3); // Recarrega 3 pontos de energia ao encontrar um obstáculo
+                        RechargeEnergy(obstacle);
                     }
                 }
             }
@@ -90,6 +88,31 @@ namespace Jewel_Collector
             positions.Add((X, Y - 1)); // Esquerda
             positions.Add((X, Y + 1)); // Direita
             return positions;
+        }
+        
+        private void CollectJewel()
+        {
+            List<(int, int)> adjacentPositions = GetAdjacentPositions();
+            foreach ((int adjX, int adjY) in adjacentPositions)
+            {
+                if (map.IsWithinBounds(adjX, adjY) && map.GetCell(adjX, adjY) is Jewel jewel)
+                {
+                    Score += jewel.Points;
+
+                    if (jewel.Symbol == "JB")
+                    {
+                        Energy += 5; // Adiciona 5 pontos de energia para a joia azul
+                    }
+
+                    map.SetCell(adjX, adjY, new EmptyCell());
+                    return;
+                }
+            }
+        }
+        
+        private void RechargeEnergy(Obstacle obstacle)
+        {
+            Energy += obstacle.EnergyPoints;
         }
     }
 }
