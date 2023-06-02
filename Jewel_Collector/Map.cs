@@ -50,14 +50,49 @@ namespace Jewel_Collector
                     ICell cell = cells[i, j];
                     Console.BackgroundColor = cell.BackgroundColor;
                     Console.ForegroundColor = cell.ForegroundColor;
-                    Console.Write(cell.Symbol);
+
+                    if (cell is Jewel jewel)
+                    {
+                        switch (jewel.Symbol)
+                        {
+                            case "JR":
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                break;
+                            case "JG":
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                break;
+                            case "JB":
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                break;
+                        }
+                        
+                        Console.Write(jewel.Symbol);
+                    }
+                    else if (cell is Obstacle obstacle)
+                    {
+                        switch (obstacle.Symbol)
+                        {
+                            case "##":
+                                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                                break;
+                            case "$$":
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                break;
+                        }
+                        
+                        Console.Write(obstacle.Symbol);
+                    }
+                    else
+                    {
+                        Console.Write(cell.Symbol);
+                    }
+                    
                     Console.ResetColor();
                 }
                 Console.WriteLine();
             }
             Console.WriteLine("Energia do robô: " + robot.Energy);
-            // Console.WriteLine("Total de joias coletadas: " + robot);
-            Console.WriteLine("Estado da sacola do robô: " + robot.Score);
+            Console.WriteLine("Total de pontos: " + robot.Score);
         }
     }
 }
