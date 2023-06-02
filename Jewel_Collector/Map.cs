@@ -55,7 +55,9 @@ namespace Jewel_Collector
                 }
                 Console.WriteLine();
             }
-            Console.WriteLine("Total de joias coletadas: " + robot.Score);
+            Console.WriteLine("Energia do robô: " + robot.Energy);
+            // Console.WriteLine("Total de joias coletadas: " + robot);
+            Console.WriteLine("Estado da sacola do robô: " + robot.Score);
         }
     }
 }

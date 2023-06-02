@@ -1,5 +1,6 @@
 ﻿using System;
 using Jewel_Collector.Enums;
+using Jewel_Collector.Exceptions;
 
 namespace Jewel_Collector
 {
@@ -35,26 +36,46 @@ namespace Jewel_Collector
             {
                 map.PrintMap(robot);
                 ConsoleKeyInfo key = Console.ReadKey(true);
+
                 switch (key.KeyChar)
                 {
                     case 'w':
-                        robot.Move(robot.X - 1, robot.Y);
+                        HandleRobotMovement(robot, robot.X - 1, robot.Y);
                         break;
                     case 's':
-                        robot.Move(robot.X + 1, robot.Y);
+                        HandleRobotMovement(robot, robot.X + 1, robot.Y);
                         break;
                     case 'a':
-                        robot.Move(robot.X, robot.Y - 1);
+                        HandleRobotMovement(robot, robot.X, robot.Y - 1);
                         break;
                     case 'd':
-                        robot.Move(robot.X, robot.Y + 1);
+                        HandleRobotMovement(robot, robot.X, robot.Y + 1);
                         break;
                     case 'g':
-                        robot.CollectJewel();
+                        robot.InteractWithAdjacentItems();
                         break;
                     default:
                         return;
                 }
+            }
+            
+        }
+        
+        private static void HandleRobotMovement(Robot robot, int newX, int newY)
+        {
+            try
+            {
+                robot.Move(newX, newY);
+            }
+            catch (OutOfMapBoundsException)
+            {
+                Console.WriteLine("ERRO: A posição está fora dos limites do mapa.");
+                throw;
+            }
+            catch (InvalidMoveException)
+            {
+                Console.WriteLine("ERRO: Movimento inválido. A posição está ocupada por outro item.");
+                throw;
             }
         }
     }

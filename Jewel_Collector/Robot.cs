@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Jewel_Collector.Exceptions;
 
 namespace Jewel_Collector
 {
@@ -12,6 +13,7 @@ namespace Jewel_Collector
         public int X { get; set; }
         public int Y { get; set; }
         public int Score { get; set; }
+        public int Energy { get; private set; } = 5;
 
         private readonly Map map;
 
@@ -26,25 +28,56 @@ namespace Jewel_Collector
 
         public void Move(int newX, int newY)
         {
-            if (map.IsWithinBounds(newX, newY) && map.GetCell(newX, newY) is EmptyCell)
+            if (!map.IsWithinBounds(newX, newY))
             {
-                map.SetCell(X, Y, new EmptyCell());
-                X = newX;
-                Y = newY;
-                map.SetCell(X, Y, this);
+                throw new OutOfMapBoundsException();
+            }
+            
+            ICell destinationCell = map.GetCell(newX, newY);
+            
+            if (Energy == 0)
+            {
+                Console.WriteLine("A energia do robô acabou. O jogo terminou.");
+                Environment.Exit(0);
+            }
+            
+            if (map.IsWithinBounds(newX, newY))
+            {
+                if (destinationCell is EmptyCell)
+                {
+                    map.SetCell(X, Y, new EmptyCell());
+                    X = newX;
+                    Y = newY;
+                    map.SetCell(X, Y, this);
+                    Energy--; // Reduz a energia em 1 após o movimento
+                    
+                }
+                else
+                {
+                    throw new InvalidMoveException();
+                }
             }
         }
-
-        public void CollectJewel()
+        
+        public void InteractWithAdjacentItems()
         {
             List<(int, int)> adjacentPositions = GetAdjacentPositions();
             foreach ((int adjX, int adjY) in adjacentPositions)
             {
-                if (map.IsWithinBounds(adjX, adjY) && map.GetCell(adjX, adjY) is Jewel jewel)
+                if (map.IsWithinBounds(adjX, adjY))
                 {
-                    Score += jewel.Points;
-                    map.SetCell(adjX, adjY, new EmptyCell());
-                    return;
+                    ICell adjacentCell = map.GetCell(adjX, adjY);
+
+                    if (adjacentCell is Jewel jewel)
+                    {
+                        Score += jewel.Points;
+                        map.SetCell(adjX, adjY, new EmptyCell());
+                        Energy = Math.Min(5, Energy + jewel.Points); // Recarrega a energia com base na pontuação da joia
+                    }
+                    else if (adjacentCell is Obstacle obstacle)
+                    {
+                        Energy = Math.Min(5, Energy + 3); // Recarrega 3 pontos de energia ao encontrar um obstáculo
+                    }
                 }
             }
         }
