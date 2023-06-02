@@ -118,11 +118,40 @@ namespace Jewel_Collector
                     return;
                 }
             }
+            
+            foreach ((int adjX, int adjY) in adjacentPositions)
+            {
+                if (map.IsWithinBounds(adjX, adjY))
+                {
+                    ICell cell = map.GetCell(adjX, adjY);
+                    if (cell is Radioactive radioactive)
+                    {
+                        Console.WriteLine("Cuidado! Você encontrou um elemento radioativo!");
+                        int penalty = Math.Max(30, Energy); // Calcula a penalidade mínima de energia
+                        Energy -= penalty;
+                        map.SetCell(adjX, adjY, new EmptyCell());
+                    }
+                }
+            }
         }
         
         private void RechargeEnergy(Obstacle obstacle)
         {
             Energy += obstacle.EnergyPoints;
+        }
+        
+        private void TransposeRadioactive(int newX, int newY)
+        {
+            if (Energy >= 30)
+            {
+                Energy -= 30;
+                Console.WriteLine("Você transpôs o elemento radioativo, perdendo 30 pontos de energia.");
+                map.SetCell(newX, newY, new EmptyCell());
+            }
+            else
+            {
+                Console.WriteLine("Você não tem energia suficiente para transpor o elemento radioativo!");
+            }
         }
     }
 }

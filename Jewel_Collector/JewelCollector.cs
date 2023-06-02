@@ -32,6 +32,8 @@ namespace Jewel_Collector
 
             Robot robot = new Robot(0, 0, map);
 
+            int fase = 1;
+
             while (true)
             {
                 map.PrintMap(robot);
@@ -53,6 +55,13 @@ namespace Jewel_Collector
                         break;
                     case 'g':
                         robot.InteractWithAdjacentItems();
+                        if (map.GetTotalJewels() == 0)
+                        {
+                            Console.WriteLine("Parabéns! Todas as joias foram coletadas. Avançando para a próxima fase...");
+                            fase++;
+                            map.IncreaseSize();
+                            map.RandomizeItems(fase);
+                        }
                         break;
                     default:
                         return;
