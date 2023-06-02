@@ -73,10 +73,10 @@ namespace Jewel_Collector
                         switch (obstacle.Symbol)
                         {
                             case "##":
-                                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                                Console.ForegroundColor = ConsoleColor.Cyan;
                                 break;
                             case "$$":
-                                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                Console.ForegroundColor = ConsoleColor.Yellow;
                                 break;
                         }
                         
@@ -92,7 +92,7 @@ namespace Jewel_Collector
                 Console.WriteLine();
             }
             Console.WriteLine("Energia do robô: " + robot.Energy);
-            Console.WriteLine("Total de pontos: " + robot.Score);
+            robot.PrintTotalJewels();
         }
     }
 }

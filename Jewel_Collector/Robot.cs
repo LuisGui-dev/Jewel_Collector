@@ -6,16 +6,18 @@ namespace Jewel_Collector
 {
     public class Robot : ICell
     {
+        private readonly Map map;
+        private readonly List<Jewel> Bag;
+        
         public ConsoleColor BackgroundColor => ConsoleColor.Black;
-        public ConsoleColor ForegroundColor => ConsoleColor.Cyan;
+        public ConsoleColor ForegroundColor => ConsoleColor.Magenta;
         public string Symbol { get; } = "ME";
 
         public int X { get; set; }
         public int Y { get; set; }
         public int Score { get; set; }
         public int Energy { get; private set; } = 5;
-
-        private readonly Map map;
+        
 
         public Robot(int x, int y, Map map)
         {
@@ -23,6 +25,7 @@ namespace Jewel_Collector
             Y = y;
             Score = 0;
             this.map = map;
+            Bag = new List<Jewel>();
             map.SetCell(x, y, this);
         }
 
@@ -57,6 +60,12 @@ namespace Jewel_Collector
                     throw new InvalidMoveException();
                 }
             }
+        }
+
+        public void PrintTotalJewels()
+        {
+            Console.WriteLine("Total de joias coletadas: " + Bag.Count);
+            Console.WriteLine("Valor total das joias coletadas: " + Score);
         }
         
         public void InteractWithAdjacentItems()
@@ -98,6 +107,7 @@ namespace Jewel_Collector
                 if (map.IsWithinBounds(adjX, adjY) && map.GetCell(adjX, adjY) is Jewel jewel)
                 {
                     Score += jewel.Points;
+                    Bag.Add(jewel);
 
                     if (jewel.Symbol == "JB")
                     {
