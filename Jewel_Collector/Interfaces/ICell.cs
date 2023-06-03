@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Jewel_Collector
+namespace Jewel_Collector.Interfaces
 {
     public interface ICell
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using Jewel_Collector.Enums;
+using Jewel_Collector.Interfaces;
 
 namespace Jewel_Collector
 {
@@ -17,34 +18,26 @@ namespace Jewel_Collector
             Points = GetPoints(type);
         }
 
-        private string GetSymbol(JewelType type)
+        private static string GetSymbol(JewelType type)
         {
-            switch (type)
+            return type switch
             {
-                case JewelType.Red:
-                    return "JR";
-                case JewelType.Green:
-                    return "JG";
-                case JewelType.Blue:
-                    return "JB";
-                default:
-                    return "";
-            }
+                JewelType.Red => "JR",
+                JewelType.Green => "JG",
+                JewelType.Blue => "JB",
+                _ => ""
+            };
         }
 
-        private int GetPoints(JewelType type)
+        private static int GetPoints(JewelType type)
         {
-            switch (type)
+            return type switch
             {
-                case JewelType.Red:
-                    return 100;
-                case JewelType.Green:
-                    return 50;
-                case JewelType.Blue:
-                    return 10;
-                default:
-                    return 0;
-            }
+                JewelType.Red => 100,
+                JewelType.Green => 50,
+                JewelType.Blue => 10,
+                _ => 0
+            };
         }
     }
 }

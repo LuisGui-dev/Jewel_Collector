@@ -1,4 +1,5 @@
 ﻿using System;
+using Jewel_Collector.Interfaces;
 
 namespace Jewel_Collector
 {

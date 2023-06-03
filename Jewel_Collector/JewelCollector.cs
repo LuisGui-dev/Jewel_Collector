@@ -9,7 +9,7 @@ namespace Jewel_Collector
     {
         public static void Main()
         {
-            Map map = new Map(10);
+            var map = new Map(10);
 
             map.SetCell(1, 9, new Jewel(JewelType.Red));
             map.SetCell(8, 8, new Jewel(JewelType.Red));
@@ -31,12 +31,12 @@ namespace Jewel_Collector
             map.SetCell(2, 5, new Obstacle(ObstacleType.Tree));
             map.SetCell(1, 4, new Obstacle(ObstacleType.Tree));
 
-            Robot robot = new Robot(0, 0, map);
+            var robot = new Robot(0, 0, map);
 
             while (true)
             {
                 map.PrintMap(robot);
-                ConsoleKeyInfo key = Console.ReadKey(true);
+                var key = Console.ReadKey(true);
 
                 switch (key.KeyChar)
                 {
@@ -60,12 +60,12 @@ namespace Jewel_Collector
                             map.IncrementPhase();
                             map.RandomizeItems();
 
-                            int robotX = robot.X;
-                            int robotY = robot.Y;
+                            var robotX = robot.X;
+                            var robotY = robot.Y;
                             
                             // Procurar a próxima célula vazia adjacente
-                            List<(int, int)> adjacentPositions = robot.GetAdjacentPositions();
-                            foreach ((int adjX, int adjY) in adjacentPositions)
+                            var adjacentPositions = robot.GetAdjacentPositions();
+                            foreach ((var adjX, var adjY) in adjacentPositions)
                             {
                                 if (map.IsWithinBounds(adjX, adjY) && map.GetCell(adjX, adjY) is EmptyCell)
                                 {
@@ -91,37 +91,31 @@ namespace Jewel_Collector
             {
                 robot.Move(newX, newY);
 
-                Map map = robot.GetMap();
-                ICell destinationCell = map.GetCell(newX, newY);
-                int fase = map.GetPhase();
+                var map = robot.GetMap();
+                var destinationCell = map.GetCell(newX, newY);
+                var phase = map.GetPhase();
 
-                List<(int, int)> adjacentPositions = robot.GetAdjacentPositions();
-                foreach ((int adjX, int adjY) in adjacentPositions)
+                var adjacentPositions = robot.GetAdjacentPositions();
+                foreach (var (adjX, adjY) in adjacentPositions)
                 {
-                    if (map.IsWithinBounds(adjX, adjY))
+                    if (!map.IsWithinBounds(adjX, adjY)) continue;
+                    var cell = map.GetCell(adjX, adjY);
+                    if (cell is Radioactive)
                     {
-                        ICell cell = map.GetCell(adjX, adjY);
-                        if (cell is Radioactive)
-                        {
-                            robot.LoseEnergy(10);
-                        }
+                        robot.LoseEnergy(10);
                     }
                 }
 
-                if (fase >= 2 && destinationCell is Radioactive)
+                if (phase < 2 || destinationCell is not Radioactive) return;
+                var key = Console.ReadKey(true);
+                if (key.KeyChar == 'g')
                 {
-                    Console.WriteLine(
-                        "Você está próximo a um elemento radioativo. Deseja transpô-lo? (Digite 'g' para transpor)");
-                    ConsoleKeyInfo key = Console.ReadKey(true);
-                    if (key.KeyChar == 'g')
-                    {
-                        robot.TransposeRadioactive(newX, newY);
-                    }
+                    robot.TransposeRadioactive(newX, newY);
                 }
             }
             catch (OutOfMapBoundsException)
             {
-                Console.WriteLine("ERRO: A posição está fora dos limites do mapa.");
+                Console.WriteLine("ERRO: Movimento inválido. A posição está fora dos limites do mapa.");
                 throw;
             }
             catch (InvalidMoveException)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Jewel_Collector.Exceptions;
+using Jewel_Collector.Interfaces;
 
 namespace Jewel_Collector
 {
@@ -8,6 +9,7 @@ namespace Jewel_Collector
     {
         private readonly Map map;
         private readonly List<Jewel> Bag;
+        private int Score { get; set; }
 
         public ConsoleColor BackgroundColor => ConsoleColor.Black;
         public ConsoleColor ForegroundColor => ConsoleColor.Magenta;
@@ -15,7 +17,6 @@ namespace Jewel_Collector
 
         public int X { get; set; }
         public int Y { get; set; }
-        public int Score { get; set; }
         public int Energy { get; private set; } = 5;
 
 
@@ -36,7 +37,7 @@ namespace Jewel_Collector
                 throw new OutOfMapBoundsException();
             }
 
-            ICell destinationCell = map.GetCell(newX, newY);
+            var destinationCell = map.GetCell(newX, newY);
 
             if (Energy == 0)
             {
@@ -44,20 +45,18 @@ namespace Jewel_Collector
                 Environment.Exit(0);
             }
 
-            if (map.IsWithinBounds(newX, newY))
+            if (!map.IsWithinBounds(newX, newY)) return;
+            if (destinationCell is EmptyCell)
             {
-                if (destinationCell is EmptyCell)
-                {
-                    map.SetCell(X, Y, new EmptyCell());
-                    X = newX;
-                    Y = newY;
-                    map.SetCell(X, Y, this);
-                    Energy--; // Reduz a energia em 1 após o movimento
-                }
-                else
-                {
-                    throw new InvalidMoveException();
-                }
+                map.SetCell(X, Y, new EmptyCell());
+                X = newX;
+                Y = newY;
+                map.SetCell(X, Y, this);
+                Energy--; // Reduz a energia em 1 após o movimento
+            }
+            else
+            {
+                throw new InvalidMoveException();
             }
         }
 
@@ -70,67 +69,61 @@ namespace Jewel_Collector
         public void InteractWithAdjacentItems()
         {
             CollectJewel();
-            List<(int, int)> adjacentPositions = GetAdjacentPositions();
-            foreach ((int adjX, int adjY) in adjacentPositions)
+            var adjacentPositions = GetAdjacentPositions();
+            foreach (var (adjX, adjY) in adjacentPositions)
             {
-                if (map.IsWithinBounds(adjX, adjY))
+                if (!map.IsWithinBounds(adjX, adjY)) continue;
+                var cell = map.GetCell(adjX, adjY);
+                switch (cell)
                 {
-                    ICell cell = map.GetCell(adjX, adjY);
-                    if (cell is Jewel)
-                    {
+                    case Jewel:
                         map.SetCell(adjX, adjY, new EmptyCell());
-                    }
-                    else if (cell is Obstacle obstacle)
-                    {
+                        break;
+                    case Obstacle obstacle:
                         RechargeEnergy(obstacle);
-                    }
+                        break;
                 }
             }
         }
 
         public List<(int, int)> GetAdjacentPositions()
         {
-            List<(int, int)> positions = new List<(int, int)>();
-            positions.Add((X - 1, Y)); // Cima
-            positions.Add((X + 1, Y)); // Baixo
-            positions.Add((X, Y - 1)); // Esquerda
-            positions.Add((X, Y + 1)); // Direita
+            var positions = new List<(int, int)>
+            {
+                (X - 1, Y), // Cima
+                (X + 1, Y), // Baixo
+                (X, Y - 1), // Esquerda
+                (X, Y + 1) // Direita
+            };
             return positions;
         }
 
         private void CollectJewel()
         {
-            List<(int, int)> adjacentPositions = GetAdjacentPositions();
-            foreach ((int adjX, int adjY) in adjacentPositions)
+            var adjacentPositions = GetAdjacentPositions();
+            foreach (var (adjX, adjY) in adjacentPositions)
             {
-                if (map.IsWithinBounds(adjX, adjY) && map.GetCell(adjX, adjY) is Jewel jewel)
+                if (!map.IsWithinBounds(adjX, adjY) || map.GetCell(adjX, adjY) is not Jewel jewel) continue;
+                Score += jewel.Points;
+                Bag.Add(jewel);
+
+                if (jewel.Symbol == "JB")
                 {
-                    Score += jewel.Points;
-                    Bag.Add(jewel);
-
-                    if (jewel.Symbol == "JB")
-                    {
-                        Energy += 5; // Adiciona 5 pontos de energia para a joia azul
-                    }
-
-                    map.SetCell(adjX, adjY, new EmptyCell());
-                    return;
+                    Energy += 5; // Adiciona 5 pontos de energia para a joia azul
                 }
+
+                map.SetCell(adjX, adjY, new EmptyCell());
+                return;
             }
 
-            foreach ((int adjX, int adjY) in adjacentPositions)
+            foreach (var (adjX, adjY) in adjacentPositions)
             {
-                if (map.IsWithinBounds(adjX, adjY))
-                {
-                    ICell cell = map.GetCell(adjX, adjY);
-                    if (cell is Radioactive radioactive)
-                    {
-                        Console.WriteLine("Cuidado! Você encontrou um elemento radioativo!");
-                        int penalty = Math.Max(30, Energy); // Calcula a penalidade mínima de energia
-                        Energy -= penalty;
-                        map.SetCell(adjX, adjY, new EmptyCell());
-                    }
-                }
+                if (!map.IsWithinBounds(adjX, adjY)) continue;
+                var cell = map.GetCell(adjX, adjY);
+                if (cell is not Radioactive) continue;
+                var penalty = Math.Max(30, Energy); // Calcula a penalidade mínima de energia
+                Energy -= penalty;
+                map.SetCell(adjX, adjY, new EmptyCell());
             }
         }
 
@@ -149,12 +142,10 @@ namespace Jewel_Collector
             if (Energy >= 30)
             {
                 Energy -= 30;
-                Console.WriteLine("Você transpôs o elemento radioativo, perdendo 30 pontos de energia.");
                 map.SetCell(newX, newY, new EmptyCell());
             }
             else
             {
-                Console.WriteLine("Você não tem energia suficiente para transpor o elemento radioativo!");
                 Energy = 0;
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using Jewel_Collector.Enums;
+using Jewel_Collector.Interfaces;
 
 namespace Jewel_Collector
 {
@@ -16,30 +17,26 @@ namespace Jewel_Collector
             EnergyPoints = GetEnergyPoints(type);
         }
 
-        private string GetSymbol(ObstacleType type)
+        private static string GetSymbol(ObstacleType type)
         {
-            switch (type)
+            return type switch
             {
-                case ObstacleType.Water:
-                    return "##";
-                case ObstacleType.Tree:
-                    return "$$";
-                default:
-                    return "";
-            }
+                ObstacleType.Water => "##",
+                ObstacleType.Tree => "$$",
+                _ => ""
+            };
         }
         
-        private int GetEnergyPoints(ObstacleType type)
+        private static int GetEnergyPoints(ObstacleType type)
         {
-            switch (type)
+            return type switch
             {
-                case ObstacleType.Water:
-                    return 0; // A água não fornece energia
-                case ObstacleType.Tree:
-                    return 3; // Cada árvore fornece 3 pontos de energia
-                default:
-                    return 0;
-            }
+                ObstacleType.Water => 0 // A água não fornece energia
+                ,
+                ObstacleType.Tree => 3 // Cada árvore fornece 3 pontos de energia
+                ,
+                _ => 0
+            };
         }
     }
 }

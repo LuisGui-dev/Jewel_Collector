@@ -1,13 +1,14 @@
 ﻿using System;
 using Jewel_Collector.Enums;
+using Jewel_Collector.Interfaces;
 
 namespace Jewel_Collector
 {
     public class Map
     {
         private ICell[,] Cells { get; set; }
-        public int Size { get; set; }
-        public int Phase { get; set; }
+        private int Size { get; set; }
+        private int Phase { get; set; }
 
         public Map(int size)
         {
@@ -19,9 +20,9 @@ namespace Jewel_Collector
 
         private void InitializeMap()
         {
-            for (int i = 0; i < Size; i++)
+            for (var i = 0; i < Size; i++)
             {
-                for (int j = 0; j < Size; j++)
+                for (var j = 0; j < Size; j++)
                 {
                     Cells[i, j] = new EmptyCell();
                 }
@@ -46,48 +47,40 @@ namespace Jewel_Collector
         public void PrintMap(Robot robot)
         {
             Console.Clear();
-            for (int i = 0; i < Size; i++)
+            for (var i = 0; i < Size; i++)
             {
-                for (int j = 0; j < Size; j++)
+                for (var j = 0; j < Size; j++)
                 {
-                    ICell cell = Cells[i, j];
+                    var cell = Cells[i, j];
                     Console.BackgroundColor = cell.BackgroundColor;
                     Console.ForegroundColor = cell.ForegroundColor;
 
-                    if (cell is Jewel jewel)
+                    switch (cell)
                     {
-                        switch (jewel.Symbol)
-                        {
-                            case "JR":
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                break;
-                            case "JG":
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                break;
-                            case "JB":
-                                Console.ForegroundColor = ConsoleColor.Blue;
-                                break;
-                        }
+                        case Jewel jewel:
+                            Console.ForegroundColor = jewel.Symbol switch
+                            {
+                                "JR" => ConsoleColor.Red,
+                                "JG" => ConsoleColor.Green,
+                                "JB" => ConsoleColor.Blue,
+                                _ => Console.ForegroundColor
+                            };
 
-                        Console.Write(jewel.Symbol);
-                    }
-                    else if (cell is Obstacle obstacle)
-                    {
-                        switch (obstacle.Symbol)
-                        {
-                            case "##":
-                                Console.ForegroundColor = ConsoleColor.Cyan;
-                                break;
-                            case "$$":
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                break;
-                        }
+                            Console.Write(jewel.Symbol);
+                            break;
+                        case Obstacle obstacle:
+                            Console.ForegroundColor = obstacle.Symbol switch
+                            {
+                                "##" => ConsoleColor.Cyan,
+                                "$$" => ConsoleColor.Yellow,
+                                _ => Console.ForegroundColor
+                            };
 
-                        Console.Write(obstacle.Symbol);
-                    }
-                    else
-                    {
-                        Console.Write(cell.Symbol);
+                            Console.Write(obstacle.Symbol);
+                            break;
+                        default:
+                            Console.Write(cell.Symbol);
+                            break;
                     }
 
                     Console.ResetColor();
@@ -102,11 +95,11 @@ namespace Jewel_Collector
 
         public int GetTotalJewels()
         {
-            int totalJewels = 0;
+            var totalJewels = 0;
 
-            for (int i = 0; i < Size; i++)
+            for (var i = 0; i < Size; i++)
             {
-                for (int j = 0; j < Size; j++)
+                for (var j = 0; j < Size; j++)
                 {
                     if (Cells[i, j] is Jewel)
                     {
@@ -120,12 +113,10 @@ namespace Jewel_Collector
 
         public void IncreaseSize()
         {
-            if (Size < 30)
-            {
-                Size++;
-                Cells = new ICell[Size, Size];
-                InitializeMap();
-            }
+            if (Size >= 30) return;
+            Size++;
+            Cells = new ICell[Size, Size];
+            InitializeMap();
         }
 
         public void RandomizeItems()
@@ -138,9 +129,9 @@ namespace Jewel_Collector
 
         private void ClearMap()
         {
-            for (int i = 0; i < Size; i++)
+            for (var i = 0; i < Size; i++)
             {
-                for (int j = 0; j < Size; j++)
+                for (var j = 0; j < Size; j++)
                 {
                     Cells[i, j] = new EmptyCell();
                 }
@@ -149,21 +140,22 @@ namespace Jewel_Collector
 
         private void RandomizeJewels()
         {
-            int maxJewels = (int)Math.Round(0.06 * Size * Size); // Define a quantidade máxima de joias proporcional ao tamanho do mapa
-            int numJewels = Math.Min(maxJewels, Size * Size); // Limita o número de joias ao tamanho do mapa
-            Random random = new Random();
+            var maxJewels = (int)Math.Round(0.06 * Size * Size); // Define a quantidade máxima de joias proporcional ao tamanho do mapa
+            var numJewels = Math.Min(maxJewels, Size * Size); // Limita o número de joias ao tamanho do mapa
+            var random = new Random();
 
-            for (int i = 0; i < numJewels; i++)
+            for (var i = 0; i < numJewels; i++)
             {
-                int x = random.Next(Size);
-                int y = random.Next(Size);
+                var x = random.Next(Size);
+                var y = random.Next(Size);
 
                 if (Cells[x, y] is EmptyCell)
                 {
-                    JewelType[] jewelTypes = Enum.GetValues(typeof(JewelType)) as JewelType[];
-                    JewelType randomType = jewelTypes[random.Next(jewelTypes.Length)]; // Gera um tipo de joia aleatório
+                    var jewelTypes = Enum.GetValues(typeof(JewelType)) as JewelType[];
+                    if (jewelTypes == null) continue;
+                    var randomType = jewelTypes[random.Next(jewelTypes.Length)]; // Gera um tipo de joia aleatório
 
-                    Jewel jewel = new Jewel(randomType);
+                    var jewel = new Jewel(randomType);
                     Cells[x, y] = jewel; // Atribuir a joia gerada à célula
                 }
                 else
@@ -175,21 +167,22 @@ namespace Jewel_Collector
 
         private void RandomizeObstacles()
         {
-            int maxObstacles = (int)Math.Round(0.12 * Size * Size);// Define a quantidade máxima de obstáculos proporcional ao tamanho do mapa
-            int numObstacles = Math.Min(maxObstacles, Size * Size); // Limita o número de obstáculos ao tamanho do mapa
-            Random random = new Random();
+            var maxObstacles = (int)Math.Round(0.12 * Size * Size); // Define a quantidade máxima de obstáculos proporcional ao tamanho do mapa
+            var numObstacles = Math.Min(maxObstacles, Size * Size); // Limita o número de obstáculos ao tamanho do mapa
+            var random = new Random();
 
-            for (int i = 0; i < numObstacles; i++)
+            for (var i = 0; i < numObstacles; i++)
             {
-                int x = random.Next(Size);
-                int y = random.Next(Size);
+                var x = random.Next(Size);
+                var y = random.Next(Size);
 
                 if (Cells[x, y] is EmptyCell)
                 {
-                    ObstacleType[] obstacleTypes = Enum.GetValues(typeof(ObstacleType)) as ObstacleType[];
-                    ObstacleType randomType = obstacleTypes[random.Next(obstacleTypes.Length)]; // Gera um tipo de obstáculo aleatório
+                    var obstacleTypes = Enum.GetValues(typeof(ObstacleType)) as ObstacleType[];
+                    if (obstacleTypes == null) continue;
+                    var randomType = obstacleTypes[random.Next(obstacleTypes.Length)]; // Gera um tipo de obstáculo aleatório
 
-                    Obstacle obstacle = new Obstacle(randomType);
+                    var obstacle = new Obstacle(randomType);
                     Cells[x, y] = obstacle; // Atribuir o obstáculo gerado à célula
                 }
                 else
@@ -201,18 +194,23 @@ namespace Jewel_Collector
 
         private void RandomizeRadioactive()
         {
-            Random random = new Random();
-
-            int x = random.Next(Size);
-            int y = random.Next(Size);
-
-            if (Cells[x, y] is EmptyCell)
+            while (true)
             {
-                Cells[x, y] = new Radioactive();
-            }
-            else
-            {
-                RandomizeRadioactive(); // Tentar novamente se a célula não estiver vazia
+                var random = new Random();
+
+                var x = random.Next(Size);
+                var y = random.Next(Size);
+
+                if (Cells[x, y] is EmptyCell)
+                {
+                    Cells[x, y] = new Radioactive();
+                }
+                else
+                {
+                    continue;
+                }
+
+                break;
             }
         }
 
