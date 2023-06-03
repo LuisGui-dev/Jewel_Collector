@@ -5,14 +5,16 @@ namespace Jewel_Collector
 {
     public class Map
     {
-       private ICell[,] Cells { get; set; }
+        private ICell[,] Cells { get; set; }
         public int Size { get; set; }
+        public int Phase { get; set; }
 
         public Map(int size)
         {
             Size = size;
             Cells = new ICell[Size, Size];
             InitializeMap();
+            Phase = 1;
         }
 
         private void InitializeMap()
@@ -66,7 +68,7 @@ namespace Jewel_Collector
                                 Console.ForegroundColor = ConsoleColor.Blue;
                                 break;
                         }
-                        
+
                         Console.Write(jewel.Symbol);
                     }
                     else if (cell is Obstacle obstacle)
@@ -80,18 +82,20 @@ namespace Jewel_Collector
                                 Console.ForegroundColor = ConsoleColor.Yellow;
                                 break;
                         }
-                        
+
                         Console.Write(obstacle.Symbol);
                     }
                     else
                     {
                         Console.Write(cell.Symbol);
                     }
-                    
+
                     Console.ResetColor();
                 }
+
                 Console.WriteLine();
             }
+
             Console.WriteLine("Energia do robô: " + robot.Energy);
             robot.PrintTotalJewels();
         }
@@ -113,7 +117,7 @@ namespace Jewel_Collector
 
             return totalJewels;
         }
-        
+
         public void IncreaseSize()
         {
             if (Size < 30)
@@ -123,15 +127,15 @@ namespace Jewel_Collector
                 InitializeMap();
             }
         }
-        
-        public void RandomizeItems(int fase)
+
+        public void RandomizeItems()
         {
             ClearMap();
-            RandomizeJewels(fase);
-            RandomizeObstacles(fase);
+            RandomizeJewels();
+            RandomizeObstacles();
             RandomizeRadioactive();
         }
-        
+
         private void ClearMap()
         {
             for (int i = 0; i < Size; i++)
@@ -142,10 +146,11 @@ namespace Jewel_Collector
                 }
             }
         }
-        
-        private void RandomizeJewels(int fase)
+
+        private void RandomizeJewels()
         {
-            int numJewels = fase * 3; // Aumenta a quantidade de joias proporcionalmente ao número da fase
+            int maxJewels = (int)Math.Round(0.06 * Size * Size); // Define a quantidade máxima de joias proporcional ao tamanho do mapa
+            int numJewels = Math.Min(maxJewels, Size * Size); // Limita o número de joias ao tamanho do mapa
             Random random = new Random();
 
             for (int i = 0; i < numJewels; i++)
@@ -155,8 +160,11 @@ namespace Jewel_Collector
 
                 if (Cells[x, y] is EmptyCell)
                 {
-                    JewelType randomType = (JewelType)random.Next(3); // Gera um tipo de joia aleatório
-                    Cells[x, y] = new Jewel(randomType);
+                    JewelType[] jewelTypes = Enum.GetValues(typeof(JewelType)) as JewelType[];
+                    JewelType randomType = jewelTypes[random.Next(jewelTypes.Length)]; // Gera um tipo de joia aleatório
+
+                    Jewel jewel = new Jewel(randomType);
+                    Cells[x, y] = jewel; // Atribuir a joia gerada à célula
                 }
                 else
                 {
@@ -164,10 +172,11 @@ namespace Jewel_Collector
                 }
             }
         }
-        
-        private void RandomizeObstacles(int fase)
+
+        private void RandomizeObstacles()
         {
-            int numObstacles = fase * 3; // Aumenta a quantidade de obstáculos proporcionalmente ao número da fase
+            int maxObstacles = (int)Math.Round(0.12 * Size * Size);// Define a quantidade máxima de obstáculos proporcional ao tamanho do mapa
+            int numObstacles = Math.Min(maxObstacles, Size * Size); // Limita o número de obstáculos ao tamanho do mapa
             Random random = new Random();
 
             for (int i = 0; i < numObstacles; i++)
@@ -177,8 +186,11 @@ namespace Jewel_Collector
 
                 if (Cells[x, y] is EmptyCell)
                 {
-                    ObstacleType randomType = (ObstacleType)random.Next(2); // Gera um tipo de obstáculo aleatório
-                    Cells[x, y] = new Obstacle(randomType);
+                    ObstacleType[] obstacleTypes = Enum.GetValues(typeof(ObstacleType)) as ObstacleType[];
+                    ObstacleType randomType = obstacleTypes[random.Next(obstacleTypes.Length)]; // Gera um tipo de obstáculo aleatório
+
+                    Obstacle obstacle = new Obstacle(randomType);
+                    Cells[x, y] = obstacle; // Atribuir o obstáculo gerado à célula
                 }
                 else
                 {
@@ -186,7 +198,7 @@ namespace Jewel_Collector
                 }
             }
         }
-        
+
         private void RandomizeRadioactive()
         {
             Random random = new Random();
@@ -202,6 +214,16 @@ namespace Jewel_Collector
             {
                 RandomizeRadioactive(); // Tentar novamente se a célula não estiver vazia
             }
+        }
+
+        public int GetPhase()
+        {
+            return Phase;
+        }
+
+        public void IncrementPhase()
+        {
+            Phase++;
         }
     }
 }

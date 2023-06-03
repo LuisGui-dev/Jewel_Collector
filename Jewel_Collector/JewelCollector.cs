@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Jewel_Collector.Enums;
 using Jewel_Collector.Exceptions;
 
@@ -32,8 +33,6 @@ namespace Jewel_Collector
 
             Robot robot = new Robot(0, 0, map);
 
-            int fase = 1;
-
             while (true)
             {
                 map.PrintMap(robot);
@@ -57,24 +56,68 @@ namespace Jewel_Collector
                         robot.InteractWithAdjacentItems();
                         if (map.GetTotalJewels() == 0)
                         {
-                            Console.WriteLine("Parabéns! Todas as joias foram coletadas. Avançando para a próxima fase...");
-                            fase++;
                             map.IncreaseSize();
-                            map.RandomizeItems(fase);
+                            map.IncrementPhase();
+                            map.RandomizeItems();
+
+                            int robotX = robot.X;
+                            int robotY = robot.Y;
+                            
+                            // Procurar a próxima célula vazia adjacente
+                            List<(int, int)> adjacentPositions = robot.GetAdjacentPositions();
+                            foreach ((int adjX, int adjY) in adjacentPositions)
+                            {
+                                if (map.IsWithinBounds(adjX, adjY) && map.GetCell(adjX, adjY) is EmptyCell)
+                                {
+                                    robotX = adjX;
+                                    robotY = adjY;
+                                    break;
+                                }
+                            }
+                            
+                            robot.Move(robotX, robotY);
                         }
+
                         break;
                     default:
                         return;
                 }
             }
-            
         }
-        
+
         private static void HandleRobotMovement(Robot robot, int newX, int newY)
         {
             try
             {
                 robot.Move(newX, newY);
+
+                Map map = robot.GetMap();
+                ICell destinationCell = map.GetCell(newX, newY);
+                int fase = map.GetPhase();
+
+                List<(int, int)> adjacentPositions = robot.GetAdjacentPositions();
+                foreach ((int adjX, int adjY) in adjacentPositions)
+                {
+                    if (map.IsWithinBounds(adjX, adjY))
+                    {
+                        ICell cell = map.GetCell(adjX, adjY);
+                        if (cell is Radioactive)
+                        {
+                            robot.LoseEnergy(10);
+                        }
+                    }
+                }
+
+                if (fase >= 2 && destinationCell is Radioactive)
+                {
+                    Console.WriteLine(
+                        "Você está próximo a um elemento radioativo. Deseja transpô-lo? (Digite 'g' para transpor)");
+                    ConsoleKeyInfo key = Console.ReadKey(true);
+                    if (key.KeyChar == 'g')
+                    {
+                        robot.TransposeRadioactive(newX, newY);
+                    }
+                }
             }
             catch (OutOfMapBoundsException)
             {

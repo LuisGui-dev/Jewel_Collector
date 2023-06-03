@@ -8,7 +8,7 @@ namespace Jewel_Collector
     {
         private readonly Map map;
         private readonly List<Jewel> Bag;
-        
+
         public ConsoleColor BackgroundColor => ConsoleColor.Black;
         public ConsoleColor ForegroundColor => ConsoleColor.Magenta;
         public string Symbol { get; } = "ME";
@@ -17,7 +17,7 @@ namespace Jewel_Collector
         public int Y { get; set; }
         public int Score { get; set; }
         public int Energy { get; private set; } = 5;
-        
+
 
         public Robot(int x, int y, Map map)
         {
@@ -35,15 +35,15 @@ namespace Jewel_Collector
             {
                 throw new OutOfMapBoundsException();
             }
-            
+
             ICell destinationCell = map.GetCell(newX, newY);
-            
+
             if (Energy == 0)
             {
                 Console.WriteLine("A energia do robô acabou. O jogo terminou.");
                 Environment.Exit(0);
             }
-            
+
             if (map.IsWithinBounds(newX, newY))
             {
                 if (destinationCell is EmptyCell)
@@ -53,7 +53,6 @@ namespace Jewel_Collector
                     Y = newY;
                     map.SetCell(X, Y, this);
                     Energy--; // Reduz a energia em 1 após o movimento
-                    
                 }
                 else
                 {
@@ -67,7 +66,7 @@ namespace Jewel_Collector
             Console.WriteLine("Total de joias coletadas: " + Bag.Count);
             Console.WriteLine("Valor total das joias coletadas: " + Score);
         }
-        
+
         public void InteractWithAdjacentItems()
         {
             CollectJewel();
@@ -77,7 +76,7 @@ namespace Jewel_Collector
                 if (map.IsWithinBounds(adjX, adjY))
                 {
                     ICell cell = map.GetCell(adjX, adjY);
-                    if (cell is Jewel jewel)
+                    if (cell is Jewel)
                     {
                         map.SetCell(adjX, adjY, new EmptyCell());
                     }
@@ -89,7 +88,7 @@ namespace Jewel_Collector
             }
         }
 
-        private List<(int, int)> GetAdjacentPositions()
+        public List<(int, int)> GetAdjacentPositions()
         {
             List<(int, int)> positions = new List<(int, int)>();
             positions.Add((X - 1, Y)); // Cima
@@ -98,7 +97,7 @@ namespace Jewel_Collector
             positions.Add((X, Y + 1)); // Direita
             return positions;
         }
-        
+
         private void CollectJewel()
         {
             List<(int, int)> adjacentPositions = GetAdjacentPositions();
@@ -118,7 +117,7 @@ namespace Jewel_Collector
                     return;
                 }
             }
-            
+
             foreach ((int adjX, int adjY) in adjacentPositions)
             {
                 if (map.IsWithinBounds(adjX, adjY))
@@ -134,13 +133,18 @@ namespace Jewel_Collector
                 }
             }
         }
-        
+
         private void RechargeEnergy(Obstacle obstacle)
         {
             Energy += obstacle.EnergyPoints;
         }
-        
-        private void TransposeRadioactive(int newX, int newY)
+
+        public void LoseEnergy(int amount)
+        {
+            Energy -= amount;
+        }
+
+        public void TransposeRadioactive(int newX, int newY)
         {
             if (Energy >= 30)
             {
@@ -151,7 +155,13 @@ namespace Jewel_Collector
             else
             {
                 Console.WriteLine("Você não tem energia suficiente para transpor o elemento radioativo!");
+                Energy = 0;
             }
+        }
+
+        public Map GetMap()
+        {
+            return map;
         }
     }
 }
