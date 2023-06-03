@@ -65,14 +65,13 @@ namespace Jewel_Collector
                             
                             // Procurar a próxima célula vazia adjacente
                             var adjacentPositions = robot.GetAdjacentPositions();
-                            foreach ((var adjX, var adjY) in adjacentPositions)
+                            foreach (var (adjX, adjY) in adjacentPositions)
                             {
-                                if (map.IsWithinBounds(adjX, adjY) && map.GetCell(adjX, adjY) is EmptyCell)
-                                {
-                                    robotX = adjX;
-                                    robotY = adjY;
-                                    break;
-                                }
+                                if (!map.IsWithinBounds(adjX, adjY) || map.GetCell(adjX, adjY) is not EmptyCell)
+                                    continue;
+                                robotX = adjX;
+                                robotY = adjY;
+                                break;
                             }
                             
                             robot.Move(robotX, robotY);

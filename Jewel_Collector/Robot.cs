@@ -121,7 +121,7 @@ namespace Jewel_Collector
                 if (!map.IsWithinBounds(adjX, adjY)) continue;
                 var cell = map.GetCell(adjX, adjY);
                 if (cell is not Radioactive) continue;
-                var penalty = Math.Max(30, Energy); // Calcula a penalidade mínima de energia
+                var penalty = Math.Min(30, Energy); // Calcula a penalidade mínima de energia
                 Energy -= penalty;
                 map.SetCell(adjX, adjY, new EmptyCell());
             }
@@ -139,15 +139,9 @@ namespace Jewel_Collector
 
         public void TransposeRadioactive(int newX, int newY)
         {
-            if (Energy >= 30)
-            {
-                Energy -= 30;
-                map.SetCell(newX, newY, new EmptyCell());
-            }
-            else
-            {
-                Energy = 0;
-            }
+            if (Energy < 30) return;
+            Energy -= 30;
+            map.SetCell(newX, newY, new EmptyCell());
         }
 
         public Map GetMap()
