@@ -4,12 +4,19 @@ using Jewel_Collector.Interfaces;
 
 namespace Jewel_Collector
 {
+    /// <summary>
+    /// Classe que representa o mapa do jogo Jewel Collector.
+    /// </summary>
     public class Map
     {
         private ICell[,] Cells { get; set; }
         private int Size { get; set; }
         private int Phase { get; set; }
 
+        /// <summary>
+        /// Construtor da classe Map.
+        /// </summary>
+        /// <param name="size">Tamanho do mapa.</param>
         public Map(int size)
         {
             Size = size;
@@ -29,21 +36,43 @@ namespace Jewel_Collector
             }
         }
 
+        /// <summary>
+        /// Obtém a célula do mapa nas coordenadas especificadas.
+        /// </summary>
+        /// <param name="x">Coordenada X.</param>
+        /// <param name="y">Coordenada Y.</param>
+        /// <returns>A célula na posição especificada.</returns>
         public ICell GetCell(int x, int y)
         {
             return Cells[x, y];
         }
 
+        /// <summary>
+        /// Define a célula do mapa nas coordenadas especificadas.
+        /// </summary>
+        /// <param name="x">Coordenada X.</param>
+        /// <param name="y">Coordenada Y.</param>
+        /// <param name="cell">A célula a ser definida.</param>
         public void SetCell(int x, int y, ICell cell)
         {
             Cells[x, y] = cell;
         }
 
+        /// <summary>
+        /// Verifica se as coordenadas estão dentro dos limites do mapa.
+        /// </summary>
+        /// <param name="x">Coordenada X.</param>
+        /// <param name="y">Coordenada Y.</param>
+        /// <returns>True se as coordenadas estiverem dentro dos limites do mapa, False caso contrário.</returns>
         public bool IsWithinBounds(int x, int y)
         {
             return x >= 0 && x < Size && y >= 0 && y < Size;
         }
 
+        /// <summary>
+        /// Imprime o mapa e informações do robô no console.
+        /// </summary>
+        /// <param name="robot">O robô.</param>
         public void PrintMap(Robot robot)
         {
             Console.Clear();
@@ -93,6 +122,10 @@ namespace Jewel_Collector
             robot.PrintTotalJewels();
         }
 
+        /// <summary>
+        /// Obtém o total de joias no mapa.
+        /// </summary>
+        /// <returns>O número total de joias no mapa.</returns>
         public int GetTotalJewels()
         {
             var totalJewels = 0;
@@ -111,6 +144,9 @@ namespace Jewel_Collector
             return totalJewels;
         }
 
+        /// <summary>
+        /// Aumenta o tamanho do mapa.
+        /// </summary>
         public void IncreaseSize()
         {
             if (Size >= 30) return;
@@ -119,6 +155,9 @@ namespace Jewel_Collector
             InitializeMap();
         }
 
+        /// <summary>
+        /// Randomiza os itens no mapa.
+        /// </summary>
         public void RandomizeItems()
         {
             ClearMap();
@@ -214,11 +253,18 @@ namespace Jewel_Collector
             }
         }
 
+        /// <summary>
+        /// Obtém a fase atual do mapa.
+        /// </summary>
+        /// <returns>A fase atual do mapa.</returns>
         public int GetPhase()
         {
             return Phase;
         }
 
+        /// <summary>
+        /// Incrementa a fase atual do mapa.
+        /// </summary>
         public void IncrementPhase()
         {
             Phase++;

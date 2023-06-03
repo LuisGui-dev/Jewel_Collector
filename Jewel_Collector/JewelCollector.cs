@@ -1,12 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using Jewel_Collector.Enums;
 using Jewel_Collector.Exceptions;
 
 namespace Jewel_Collector
 {
+    /// <summary>
+    /// Classe principal do jogo Jewel Collector.
+    /// </summary>
     public class JewelCollector
     {
+        /// <summary>
+        /// Método de entrada do jogo.
+        /// </summary>
         public static void Main()
         {
             var map = new Map(10);
@@ -84,6 +89,12 @@ namespace Jewel_Collector
             }
         }
 
+        /// <summary>
+        /// Lida com o movimento do robô.
+        /// </summary>
+        /// <param name="robot">O robô.</param>
+        /// <param name="newX">A nova coordenada X.</param>
+        /// <param name="newY">A nova coordenada Y.</param>
         private static void HandleRobotMovement(Robot robot, int newX, int newY)
         {
             try
