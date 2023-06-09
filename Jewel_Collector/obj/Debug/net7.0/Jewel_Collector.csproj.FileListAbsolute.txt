@@ -1,0 +1,15 @@
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\bin\Debug\net7.0\Jewel_Collector.exe
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\bin\Debug\net7.0\Jewel_Collector.deps.json
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\bin\Debug\net7.0\Jewel_Collector.runtimeconfig.json
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\bin\Debug\net7.0\Jewel_Collector.dll
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\bin\Debug\net7.0\Jewel_Collector.pdb
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\Jewel_Collector.csproj.AssemblyReference.cache
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\Jewel_Collector.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\Jewel_Collector.AssemblyInfoInputs.cache
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\Jewel_Collector.AssemblyInfo.cs
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\Jewel_Collector.csproj.CoreCompileInputs.cache
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\Jewel_Collector.dll
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\refint\Jewel_Collector.dll
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\Jewel_Collector.pdb
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\Jewel_Collector.genruntimeconfig.cache
+C:\Users\luisg\RiderProjects\Jewel_Collector\Jewel_Collector\obj\Debug\net7.0\ref\Jewel_Collector.dll
